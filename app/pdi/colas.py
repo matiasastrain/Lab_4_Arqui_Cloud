@@ -30,7 +30,7 @@ def encolar_notificacion(historial_id: int, folio: str) -> bool:
         from google.cloud import tasks_v2
 
         cliente = tasks_v2.CloudTasksClient()
-        cola = cliente.queue_path(settings.project_id, settings.region, settings.tasks_queue)
+        cola = cliente.queue_path(settings.project_id, settings.tasks_location, settings.tasks_queue)
         destino = f"{settings.notificaciones_url}/tareas/notificar"
         tarea = {
             "http_request": {

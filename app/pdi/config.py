@@ -69,6 +69,10 @@ class Settings:
 
     # --- servicios internos -------------------------------------------------
     @property
+    def tasks_location(self) -> str:
+        return os.getenv("TASKS_LOCATION", self.region)
+
+    @property
     def tasks_queue(self) -> str:
         return os.getenv("TASKS_QUEUE", "")
 

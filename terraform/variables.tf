@@ -121,3 +121,9 @@ variable "force_destroy" {
   type        = bool
   default     = true
 }
+
+variable "tasks_region" {
+  description = "Región de la cola de Cloud Tasks (Santiago no la admite)."
+  type        = string
+  default     = "southamerica-east1"
+}

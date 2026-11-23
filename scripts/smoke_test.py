@@ -61,8 +61,8 @@ def main() -> None:
         h = {"Authorization": f"Bearer {token}"} if token else {}
         return s.request(metodo, base + ruta, headers=h, timeout=60, **kw)
 
-    r = llamar("GET", "/healthz")
-    paso("Gestor responde /healthz", r.status_code == 200, r.text.strip())
+    r = llamar("GET", "/docs")
+    paso("Gestor responde /docs", r.status_code == 200, r.text.strip())
 
     cuerpo = random.randint(10_000_000, 25_000_000)
     rut = f"{cuerpo}-{digito_verificador(cuerpo)}"

@@ -9,6 +9,7 @@ locals {
     ENV_NAME   = var.environment
     PROJECT_ID = var.project_id
     REGION     = var.region
+    TASKS_LOCATION = var.tasks_region
     PORTAL_URL = local.portal_publico
   }
 
