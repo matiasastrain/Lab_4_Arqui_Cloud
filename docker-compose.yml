@@ -1,0 +1,102 @@
+# Entorno local con Docker (sin GCP). No reemplaza el despliegue en Cloud Run:
+# reutiliza los mismos Dockerfile de app/ y portal/ que construye Cloud Build.
+#
+#   cp .env.example .env      (opcional: sin .env se usan los valores por defecto)
+#   docker compose up --build
+#
+# Portal: http://localhost:8081   API: http://localhost:8080/docs
+
+x-app: &app
+  build: ./app
+  image: pdi-poc-app:local
+  restart: unless-stopped
+  environment: &app-env
+    LOCAL_MODE: "1"            # sin GCP: disco local, sin Cloud Tasks, sin IA
+    IA_HABILITADA: "0"         # avisos por plantilla
+    ENV_NAME: docker
+    DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-pdi_app}:${POSTGRES_PASSWORD:-pdi_local}@postgres:5432/${POSTGRES_DB:-pdi}
+    JWT_SECRET: ${JWT_SECRET:-desarrollo-local-solo-para-pruebas-32-bytes}
+    FUNCIONARIO_API_KEY: ${FUNCIONARIO_API_KEY:-clave-local}
+    PORTAL_URL: http://localhost:${PORTAL_PORT:-8081}
+    CORS_ORIGINS: http://localhost:${PORTAL_PORT:-8081}
+  healthcheck: &app-health
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz', timeout=3)"]
+    interval: 10s
+    timeout: 5s
+    retries: 6
+    start_period: 10s
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pdi_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pdi_local}
+      POSTGRES_DB: ${POSTGRES_DB:-pdi}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adaptadores:
+    <<: *app
+    environment:
+      <<: *app-env
+      APP_MODE: adaptadores
+    ports:
+      - "${ADAPTADORES_PORT:-8083}:8080"
+
+  notificaciones:
+    <<: *app
+    environment:
+      <<: *app-env
+      APP_MODE: notificaciones
+    ports:
+      - "${NOTIFICACIONES_PORT:-8082}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gestor:
+    <<: *app
+    environment:
+      <<: *app-env
+      APP_MODE: gestor
+      NOTIFICACIONES_URL: http://notificaciones:8080
+      ADAPTADORES_URL: http://adaptadores:8080
+      LOCAL_STORAGE_DIR: /tmp/pdi_local_storage
+    volumes:
+      # /tmp de la imagen tiene permisos 1777, así el usuario sin privilegios puede escribir.
+      - adjuntos:/tmp
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      notificaciones:
+        condition: service_healthy
+      adaptadores:
+        condition: service_healthy
+
+  portal:
+    build: ./portal
+    image: pdi-poc-portal:local
+    restart: unless-stopped
+    environment:
+      API_URL: http://localhost:${API_PORT:-8080}   # la usa el navegador, no el contenedor
+      ENV_NAME: docker
+    ports:
+      - "${PORTAL_PORT:-8081}:8080"
+    depends_on:
+      gestor:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  adjuntos:
