@@ -94,11 +94,11 @@ docker compose up --build       # agrega -d para dejarlo en segundo plano
 
 | Servicio | URL |
 |---|---|
-| Portal (ciudadano y funcionario) | <http://localhost:8081> |
-| API del gestor (Swagger) | <http://localhost:8080/docs> |
-| Notificaciones | <http://localhost:8082/healthz> |
-| Adaptadores GEPOL/B3000 simulados | <http://localhost:8083/docs> |
-| PostgreSQL | `localhost:5432` (usuario `pdi_app`, clave `pdi_local`, base `pdi`) |
+| Portal (ciudadano y funcionario) | <http://localhost:8091> |
+| API del gestor (Swagger) | <http://localhost:8090/docs> |
+| Notificaciones | <http://localhost:8092/healthz> |
+| Adaptadores GEPOL/B3000 simulados | <http://localhost:8093/docs> |
+| PostgreSQL | `localhost:5433` (usuario `pdi_app`, clave `pdi_local`, base `pdi`) |
 
 La clave del funcionario es `FUNCIONARIO_API_KEY` (por defecto `clave-local`).
 
@@ -117,7 +117,7 @@ docker compose logs -f gestor notificaciones
 Prueba de punta a punta contra el entorno Docker:
 
 ```bash
-python scripts/smoke_test.py --api http://localhost:8080 --clave clave-local
+python scripts/smoke_test.py --api http://localhost:8090 --clave clave-local
 ```
 
 Bajar todo:
@@ -127,7 +127,7 @@ docker compose down        # detiene y borra los contenedores (conserva BD y adj
 docker compose down -v     # además borra los volúmenes (BD y adjuntos)
 ```
 
-Si un puerto está ocupado, cámbialo en `.env` (por ejemplo `PORTAL_PORT=8091`).
+Si un puerto está ocupado, cámbialo en `.env` (por ejemplo `PORTAL_PORT=8095`).
 
 ## Problemas frecuentes
 
