@@ -35,16 +35,16 @@ La IA solo redacta el aviso. Nunca decide el resultado del trámite.
 1. Abrir <https://shell.cloud.google.com> y subir o clonar este repositorio.
 2. Comprobar Gemini antes de gastar tiempo en el resto:
    ```bash
-   gcloud config set project TU_PROYECTO
+   gcloud config set project pdi-cloud-515801
    gcloud services enable aiplatform.googleapis.com
    pip install google-genai
-   python3 scripts/probar_gemini.py --proyecto TU_PROYECTO
+   python3 scripts/probar_gemini.py --proyecto pdi-cloud-515801
    ```
    Si falla, probar otra `vertex_location` o `ia_habilitada=false` (el sistema usa la plantilla fija).
 3. Desplegar (ambiente `dev` por defecto, usa `db-f1-micro`):
    ```bash
    chmod +x scripts/*.sh
-   ./scripts/deploy.sh TU_PROYECTO dev
+   ./scripts/deploy.sh pdi-cloud-515801 dev
    ```
    Demora entre 12 y 20 minutos (Cloud SQL y las construcciones de imágenes son lo más lento).
 4. Al terminar se imprimen `url_portal`, `url_api` y el comando de prueba rápida.
@@ -54,7 +54,7 @@ La IA solo redacta el aviso. Nunca decide el resultado del trámite.
 ```bash
 cd terraform
 terraform init
-terraform apply -var-file=envs/dev.tfvars -var="project_id=TU_PROYECTO"
+terraform apply -var-file=envs/dev.tfvars -var="project_id=(https://pdi-portal-dev-617402588995.southamerica-west1.run.app)"
 terraform output
 terraform output -raw funcionario_api_key
 ```
