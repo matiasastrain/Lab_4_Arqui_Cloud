@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trámites Migratorios PDI (PoC)</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+<header>
+  <div>
+    <strong>Trámites Migratorios</strong>
+    <span class="sub">Prueba de concepto TICS400 · ClaveÚnica, GEPOL, B3000 y mensajería simulados</span>
+  </div>
+  <nav>
+    <button data-vista="ciudadano" class="tab activo">Ciudadano</button>
+    <button data-vista="funcionario" class="tab">Funcionario</button>
+  </nav>
+</header>
+
+<main>
+  <div id="mensaje" class="mensaje oculto"></div>
+
+  <!-- ===================== CIUDADANO ===================== -->
+  <section id="vista-ciudadano">
+    <div id="c-login" class="tarjeta">
+      <h2>Ingreso ciudadano <small>(ClaveÚnica simulada)</small></h2>
+      <form id="f-c-login" class="grid">
+        <label>RUT <input name="rut" placeholder="12.345.678-5" required></label>
+        <label>Nombre <input name="nombre" placeholder="Nombre Apellido" required></label>
+        <label>Correo <input name="email" type="email" placeholder="correo@ejemplo.cl"></label>
+        <label>Teléfono <input name="telefono" placeholder="+56912345678"></label>
+        <button>Ingresar</button>
+      </form>
+    </div>
+
+    <div id="c-panel" class="oculto">
+      <div class="barra"><span id="c-quien"></span><button class="sec" id="c-salir">Salir</button></div>
+      <div class="tarjeta">
+        <h2>Nuevo trámite</h2>
+        <form id="f-nuevo" class="grid">
+          <label>Tipo <select name="tipo" id="sel-tipo"></select></label>
+          <label class="ancho">Detalle (opcional) <input name="detalle" maxlength="1000"></label>
+          <button>Iniciar trámite</button>
+        </form>
+      </div>
+      <div class="tarjeta">
+        <h2>Mis trámites <button class="sec chico" id="c-refrescar">Actualizar</button></h2>
+        <table><thead><tr><th>Folio</th><th>Tipo</th><th>Estado</th><th>Actualizado</th></tr></thead>
+          <tbody id="c-lista"></tbody></table>
+      </div>
+      <div id="c-detalle" class="tarjeta oculto"></div>
+    </div>
+  </section>
+
+  <!-- ===================== FUNCIONARIO ===================== -->
+  <section id="vista-funcionario" class="oculto">
+    <div id="f-login" class="tarjeta">
+      <h2>Ingreso funcionario</h2>
+      <form id="f-f-login" class="grid">
+        <label>Usuario <input name="usuario" value="funcionario1" required></label>
+        <label>Clave <input name="clave" type="password" required></label>
+        <button>Ingresar</button>
+      </form>
+      <p class="ayuda">La clave se obtiene con <code>terraform output -raw funcionario_api_key</code>.</p>
+    </div>
+
+    <div id="f-panel" class="oculto">
+      <div class="barra"><span id="f-quien"></span><button class="sec" id="f-salir">Salir</button></div>
+      <div class="tarjeta">
+        <h2>Reporte resumen <button class="sec chico" id="f-refrescar">Actualizar</button></h2>
+        <div id="f-reporte" class="kpis"></div>
+      </div>
+      <div class="tarjeta">
+        <h2>Bandeja
+          <select id="f-filtro">
+            <option value="">Todos</option><option>RECIBIDO</option><option>EN_REVISION</option>
+            <option>OBSERVADO</option><option>APROBADO</option><option>RECHAZADO</option>
+          </select>
+        </h2>
+        <table><thead><tr><th>Folio</th><th>Tipo</th><th>RUT</th><th>Nombre</th><th>Estado</th></tr></thead>
+          <tbody id="f-lista"></tbody></table>
+      </div>
+      <div id="f-detalle" class="tarjeta oculto"></div>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

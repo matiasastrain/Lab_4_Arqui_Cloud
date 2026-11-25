@@ -1,0 +1,10 @@
+ambiente               = "prod"
+vpc_cidr               = "10.10.0.0/16"
+db_tier                = "db-custom-2-8192"
+db_alta_disponibilidad = true
+db_disco_gb            = 100
+db_respaldos           = true
+proteger_datos         = true
+run_min_instancias     = 1
+run_max_instancias     = 10
+habilitar_borde        = true

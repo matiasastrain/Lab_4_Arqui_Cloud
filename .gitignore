@@ -1,0 +1,7 @@
+.venv-local/
+**/__pycache__/
+.pytest_cache/
+app/datos_locales/
+terraform/.terraform/
+terraform/*.tfstate*
+*.zip

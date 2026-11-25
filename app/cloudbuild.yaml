@@ -1,0 +1,8 @@
+# Usado por Terraform (registry_build.tf) con: gcloud builds submit --config
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_IMAGE}", "."]
+images: ["${_IMAGE}"]
+options:
+  # Obligatorio al usar una cuenta de servicio propia para construir
+  logging: CLOUD_LOGGING_ONLY
