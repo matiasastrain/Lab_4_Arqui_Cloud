@@ -50,6 +50,9 @@ Los comandos usan el ID de nuestro proyecto, `pdi-cloud-515801`. Para desplegar 
    ```bash
    git clone https://github.com/matiasastrain/Lab_4_Arqui_Cloud.git pdi-poc && cd pdi-poc
    ```
+   El repositorio es privado: `git clone` pide el usuario de GitHub y, como contraseña, un
+   *personal access token* (GitHub no acepta la contraseña de la cuenta). La alternativa es
+   descargar el ZIP desde GitHub (**Code → Download ZIP**), subirlo con **⋮ → Upload** y descomprimirlo.
 2. Comprobar Gemini antes de gastar tiempo en el resto:
    ```bash
    gcloud config set project pdi-cloud-515801
@@ -62,8 +65,10 @@ Los comandos usan el ID de nuestro proyecto, `pdi-cloud-515801`. Para desplegar 
 3. Desplegar (ambiente `dev` por defecto, usa `db-f1-micro`):
    ```bash
    chmod +x scripts/*.sh
-   ./scripts/deploy.sh pdi-cloud-515801 dev
+   ./scripts/deploy.sh pdi-cloud-515801 dev -parallelism=2
    ```
+   `-parallelism=2` limita las conexiones simultáneas de Terraform. Cloud Shell no tiene IPv6 y, con
+   muchas conexiones en paralelo, algunas fallan con `connection refused` o `cannot assign requested address`.
    Demora entre 12 y 20 minutos (Cloud SQL y las construcciones de imágenes son lo más lento).
    El script crea el bucket del estado de Terraform (`pdi-cloud-515801-tfstate-pdi`, un prefijo por ambiente).
 4. Al terminar se imprimen `url_portal`, `url_api`, `url_docs` y el comando de prueba rápida.
@@ -75,7 +80,7 @@ El bucket de estado debe existir (lo crea `deploy.sh` la primera vez).
 ```bash
 cd terraform
 terraform init -backend-config="bucket=pdi-cloud-515801-tfstate-pdi" -backend-config="prefix=pdi/dev"
-terraform apply -var-file=envs/dev.tfvars -var="project_id=pdi-cloud-515801"
+terraform apply -parallelism=2 -var-file=envs/dev.tfvars -var="project_id=pdi-cloud-515801"
 terraform output
 terraform output -raw funcionario_api_key
 ```
@@ -125,8 +130,9 @@ cd app && pip install -r requirements-dev.txt && python3 -m pytest -q
 
 | Síntoma | Causa y solución |
 |---|---|
+| `git clone` pide usuario y contraseña | El repositorio es privado. Usar un *personal access token* como contraseña, o descargar el ZIP desde GitHub y subirlo a Cloud Shell. |
 | `command not found: terraform` | El comando se ejecutó fuera de Cloud Shell, o Cloud Shell no trae Terraform. Instalarlo como se indica en Requisitos. |
-| `connection refused` hacia `*.googleapis.com` durante el apply | Corte de red pasajero de Cloud Shell. Repetir `deploy.sh`: Terraform retoma desde donde quedó. |
+| `connection refused` o `cannot assign requested address` hacia `*.googleapis.com` durante el apply | Cloud Shell no tiene IPv6 y rechaza parte de las conexiones simultáneas. Desplegar con `-parallelism=2` (como en el paso 3); si vuelve a pasar, repetir: Terraform retoma desde donde quedó. |
 | `Location 'southamerica-west1' is not a valid location` (Cloud Tasks) | Resuelto con `region_tareas = southamerica-east1`. |
 | `/healthz` responde 404 de Google en `*.run.app` | Google reserva las rutas terminadas en "z". Usar `/api/tipos` o `/docs` para comprobar la API. |
 | 403 al abrir la URL | La organización bloquea el acceso público. Usar `-var=acceso_publico=false`; la prueba rápida agrega `--id-token "$(gcloud auth print-identity-token)"` sola. |
