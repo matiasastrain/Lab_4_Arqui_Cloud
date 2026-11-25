@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Despliega la PoC completa con Terraform.
 # Uso: ./scripts/deploy.sh PROYECTO [dev|qa|prod] [-var=...]
-#   ej: ./scripts/deploy.sh mi-proyecto dev
-#       ./scripts/deploy.sh mi-proyecto dev -var=acceso_publico=false
+#   ej: ./scripts/deploy.sh pdi-cloud-515801 dev
+#       ./scripts/deploy.sh pdi-cloud-515801 dev -var=acceso_publico=false
 set -euo pipefail
 
 PROYECTO="${1:?Uso: ./scripts/deploy.sh PROYECTO [dev|qa|prod] [-var=...]}"

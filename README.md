@@ -44,28 +44,28 @@ mkdir -p ~/bin && cd /tmp && wget -q https://releases.hashicorp.com/terraform/1.
 
 ## Despliegue paso a paso (Cloud Shell)
 
-En los comandos, reemplazar `TU_PROYECTO` por el ID del proyecto (en nuestro caso `pdi-cloud-515801`).
+Los comandos usan el ID de nuestro proyecto, `pdi-cloud-515801`. Para desplegar en otro proyecto, reemplazarlo por el ID correspondiente.
 
 1. Abrir <https://shell.cloud.google.com> y clonar este repositorio (o subirlo con **⋮ → Upload**):
    ```bash
-   git clone https://github.com/USUARIO/REPOSITORIO.git pdi-poc && cd pdi-poc
+   git clone https://github.com/matiasastrain/Lab_4_Arqui_Cloud.git pdi-poc && cd pdi-poc
    ```
 2. Comprobar Gemini antes de gastar tiempo en el resto:
    ```bash
-   gcloud config set project TU_PROYECTO
+   gcloud config set project pdi-cloud-515801
    gcloud services enable aiplatform.googleapis.com
    pip install --user google-genai
-   python3 scripts/probar_gemini.py --proyecto TU_PROYECTO
+   python3 scripts/probar_gemini.py --proyecto pdi-cloud-515801
    ```
    Si el modelo no responde, el script sugiere otro (`-var=gemini_modelo=...`). También se puede usar otra
    `vertex_location` o `ia_habilitada=false` (el sistema usa la plantilla fija).
 3. Desplegar (ambiente `dev` por defecto, usa `db-f1-micro`):
    ```bash
    chmod +x scripts/*.sh
-   ./scripts/deploy.sh TU_PROYECTO dev
+   ./scripts/deploy.sh pdi-cloud-515801 dev
    ```
    Demora entre 12 y 20 minutos (Cloud SQL y las construcciones de imágenes son lo más lento).
-   El script crea el bucket del estado de Terraform (`TU_PROYECTO-tfstate-pdi`, un prefijo por ambiente).
+   El script crea el bucket del estado de Terraform (`pdi-cloud-515801-tfstate-pdi`, un prefijo por ambiente).
 4. Al terminar se imprimen `url_portal`, `url_api`, `url_docs` y el comando de prueba rápida.
 
 ### Alternativa: Terraform manual
@@ -74,8 +74,8 @@ El bucket de estado debe existir (lo crea `deploy.sh` la primera vez).
 
 ```bash
 cd terraform
-terraform init -backend-config="bucket=TU_PROYECTO-tfstate-pdi" -backend-config="prefix=pdi/dev"
-terraform apply -var-file=envs/dev.tfvars -var="project_id=TU_PROYECTO"
+terraform init -backend-config="bucket=pdi-cloud-515801-tfstate-pdi" -backend-config="prefix=pdi/dev"
+terraform apply -var-file=envs/dev.tfvars -var="project_id=pdi-cloud-515801"
 terraform output
 terraform output -raw funcionario_api_key
 ```
@@ -84,7 +84,7 @@ Ambientes: `envs/dev.tfvars`, `envs/qa.tfvars`, `envs/prod.tfvars` (cambian tama
 
 ### Opciones
 
-Se agregan al final de `deploy.sh` o de `terraform apply`, por ejemplo `./scripts/deploy.sh TU_PROYECTO dev -var=acceso_publico=false`.
+Se agregan al final de `deploy.sh` o de `terraform apply`, por ejemplo `./scripts/deploy.sh pdi-cloud-515801 dev -var=acceso_publico=false`.
 
 | Variable | Uso |
 |---|---|
@@ -140,7 +140,7 @@ cd app && pip install -r requirements-dev.txt && python3 -m pytest -q
 La PoC en `dev` usa Cloud SQL `db-f1-micro`, Cloud Run con escala a cero y Gemini por tokens, por lo que el costo es bajo, pero Cloud SQL cobra mientras exista. **Destruir al terminar la revisión:**
 
 ```bash
-./scripts/destroy.sh TU_PROYECTO dev
+./scripts/destroy.sh pdi-cloud-515801 dev
 ```
 
 ## Seguridad

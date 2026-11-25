@@ -2,7 +2,7 @@
 """Comprueba que Gemini en Vertex AI responde ANTES de desplegar todo.
 
   pip install google-genai
-  python3 scripts/probar_gemini.py --proyecto TU_PROYECTO [--modelo M] [--ubicacion global]
+  python3 scripts/probar_gemini.py --proyecto pdi-cloud-515801 [--modelo M] [--ubicacion global]
 
 Si el modelo indicado no está disponible, prueba otros candidatos e indica
 cuál usar con -var="gemini_modelo=..." al desplegar.
